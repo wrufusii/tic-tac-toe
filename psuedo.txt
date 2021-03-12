@@ -1,0 +1,18 @@
+start game;
+//player is X - X goes first
+
+player makes selection;
+if field is empty, add mark to array at index
+fill field with mark
+update the board
+check if winning move
+
+PC makes selection;
+if field is empty, add mark to array at index
+fill field with mark
+update the board
+check if winning move
+
+if array is full it's a draw
+
+

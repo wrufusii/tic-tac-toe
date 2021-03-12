@@ -39,11 +39,12 @@ const gameBoard = (() => {
 const displayContoller = (() => {
   //this is the interface and display
   const fields = document.querySelectorAll(".field");
+  const result = document.getElementById("result");
   let resetButton; //select reset button elem
 
   fields.forEach((field) =>
     field.addEventListener("click", function (e) {
-      if (e.target.textContent !== "") return;
+      if (e.target.textContent !== "" || gameContoller.checkGameOver()) return;
       gameContoller.playRound(e.target.dataset.index);
       updateGameboard();
     })
@@ -55,9 +56,15 @@ const displayContoller = (() => {
     });
   }
 
+  const showWinner = (sign) => {
+    result.textContent = `${sign}'s win`;
+  };
+
   const resetGameboard = () => {
     //todo
   };
+
+  return { showWinner };
 })();
 
 const gameContoller = (() => {
@@ -65,6 +72,10 @@ const gameContoller = (() => {
   const player2 = Player("X");
   let round = 1;
   let isGameOver = false;
+
+  const checkGameOver = () => {
+    return isGameOver;
+  };
 
   const playRound = (index) => {
     let sign = round % 2 === 1 ? "X" : "0";
@@ -82,20 +93,18 @@ const gameContoller = (() => {
         indexesOwned.push(i);
       }
     }
-
     //loop through each winning combo
     for (let i = 0; i < winningCombos.length; i++) {
       let result = indexesOwned.filter((index) =>
         winningCombos[i].includes(index)
       );
-
       if (result.length === 3) {
-        console.log("true");
+        console.log("win");
         isGameOver = true;
+        displayContoller.showWinner(sign);
         return true;
       }
     }
-
     if (round > 9) {
       console.log("draw");
       isGameOver = true;
@@ -113,5 +122,5 @@ const gameContoller = (() => {
     [2, 4, 6]
   ];
 
-  return { playRound };
+  return { playRound, checkGameOver };
 })();
