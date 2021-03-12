@@ -1,19 +1,17 @@
 import "/src/styles.css";
 
-const player = (sign) => {
-  this.sign = sign;
-
+//factory for creating players
+const Player = (sign) => {
   const getSign = () => {
     return sign;
   };
-
+  //method available using getSign()
   return { getSign };
 };
 
 const gameBoard = (() => {
-  //this is establishing the methods of the gameboard
-  //to be invoked or requested by the display controller
-  const board = new Array(9);
+  //this is establishing the methods of the gameboard to be invoked or requested by the display controller
+  const board = new Array(9).fill("");
 
   const getField = (index) => {
     if (index < 0 || index >= board.length) {
@@ -31,7 +29,7 @@ const gameBoard = (() => {
 
   const reset = () => {
     board.forEach((elem, index, array) => {
-      array[index] = null;
+      array[index] = "";
     });
   };
 
@@ -39,17 +37,23 @@ const gameBoard = (() => {
 })();
 
 const displayContoller = (() => {
-  //todo
+  //this is the interface and display
   const fields = document.querySelectorAll(".field");
   let resetButton; //select reset button elem
 
   fields.forEach((field) =>
     field.addEventListener("click", function (e) {
-      //
+      if (e.target.textContent !== "") return;
+      gameContoller.playRound(e.target.dataset.index);
+      updateGameboard();
     })
   );
 
-  const updateGameboard = () => {};
+  function updateGameboard() {
+    fields.forEach((field) => {
+      field.textContent = gameBoard.getField(field.dataset.index);
+    });
+  }
 
   const resetGameboard = () => {
     //todo
@@ -57,5 +61,57 @@ const displayContoller = (() => {
 })();
 
 const gameContoller = (() => {
-  //todo
+  const player1 = Player("0");
+  const player2 = Player("X");
+  let round = 1;
+  let isGameOver = false;
+
+  const playRound = (index) => {
+    let sign = round % 2 === 1 ? "X" : "0";
+    gameBoard.setField(index, sign);
+    round++;
+    checkWin(sign);
+  };
+
+  const checkWin = (sign) => {
+    //get all field indexes that have player sign
+    let indexesOwned = [];
+
+    for (let i = 0; i < 9; i++) {
+      if (gameBoard.getField(i) === sign) {
+        indexesOwned.push(i);
+      }
+    }
+
+    //loop through each winning combo
+    for (let i = 0; i < winningCombos.length; i++) {
+      let result = indexesOwned.filter((index) =>
+        winningCombos[i].includes(index)
+      );
+
+      if (result.length === 3) {
+        console.log("true");
+        isGameOver = true;
+        return true;
+      }
+    }
+
+    if (round > 9) {
+      console.log("draw");
+      isGameOver = true;
+    }
+  };
+
+  const winningCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
+
+  return { playRound };
 })();
